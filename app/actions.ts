@@ -73,7 +73,7 @@ export async function createOrder(data: CheckoutFormValues) {
       },
     });
 
-    // re_FmL8MT5w_v4U2TW94uvZTW2MxahdUFPiy
+    const paymentUrl = "https://stripe.com";
 
     await sendEmail(
       data.email,
@@ -81,11 +81,12 @@ export async function createOrder(data: CheckoutFormValues) {
       PayOrderTemplate({
         orderId: order.id,
         totalAmount: order.totalAmount,
-        paymentUrl: "https://stripe.com",
+        paymentUrl,
       })
     );
+
+    return paymentUrl;
   } catch (error) {
     console.log(error, "Error actions.ts");
-    
   }
 }
