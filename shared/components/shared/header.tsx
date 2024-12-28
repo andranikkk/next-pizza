@@ -1,13 +1,17 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import toast from "react-hot-toast";
 import { cn } from "@/shared/lib/utils";
-import { User } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
 
-import { Button } from "../ui";
 import { Container } from "./container";
 import { SearchInput } from "./search-input";
 import { CartButton } from "./cart-button";
+import { ProfileButton } from "./profile-button";
+import { AuthModal } from "./modals";
 
 interface Props {
   className?: string;
@@ -20,6 +24,29 @@ export const Header: React.FC<Props> = ({
   hasSearch = true,
   hasCart = true,
 }) => {
+  const [openAuthModal, setOpenAuthModal] = useState(false);
+  const router = useRouter();
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    let toastMessage = "";
+
+    if (searchParams.has("verified")) {
+      toastMessage = "Successfully verified your email!";
+    }
+
+    if (toastMessage) {
+      setTimeout(() => {
+        router.replace("/");
+        toast.success(toastMessage, {
+          icon: "✅",
+          duration: 3000,
+        });
+      }, 1000);
+    }
+  }, []);
+
   return (
     <header className={cn("border-b", className)}>
       <Container className="flex items-center justify-between py-8">
@@ -42,9 +69,12 @@ export const Header: React.FC<Props> = ({
         )}
 
         <div className="flex items-center gap-3">
-          <Button variant="secondary" className="flex items-center gap-1">
-            <User size={16} /> Sign in
-          </Button>
+          <AuthModal
+            open={openAuthModal}
+            onClose={() => setOpenAuthModal(false)}
+          />
+
+          <ProfileButton onClickSignIn={() => setOpenAuthModal(true)} />
 
           {hasCart && <CartButton />}
         </div>
